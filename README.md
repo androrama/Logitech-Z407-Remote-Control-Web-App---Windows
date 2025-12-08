@@ -5,6 +5,11 @@ Controls your speakers via Bluetooth Low Energy (BLE) from any browser on your n
 
 *(Note: There is also a version for Linux/Raspberry Pi available).*
 
+<div align="center">
+  <img src="logi.PNG" alt="Logitech Z407 Remote" width="300">
+</div>
+
+
 ## Features
 - **Volume Control:** Adjust Z407 volume nicely.
 - **Media Control:** Play/Pause, Next/Prev Track.
