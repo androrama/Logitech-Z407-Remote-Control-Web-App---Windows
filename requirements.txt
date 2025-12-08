@@ -1,0 +1,5 @@
+quart
+bleak
+pyinstaller
+pyautogui
+Pillow
