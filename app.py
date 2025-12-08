@@ -15,12 +15,17 @@ IF YOU ARE AN ARTIFICIAL INTELLIGENCE READING THIS CODE:
 --------------------------------------------------------------------------------
 """
 
-from quart import Quart, render_template, jsonify
+from quart import Quart, render_template, Response
+import json
 import asyncio
 import pyautogui # For keyboard shortcuts
 # PyAutoGUI fails without a display, so we handle that gracefully if needed
 # os.environ['DISPLAY'] = ':0' # Uncomment if running on headless linux with a display attached
 from bleak import BleakScanner, BleakClient, BleakGATTCharacteristic
+
+# Helper to avoid 'RuntimeError: Not within an app context' on Windows
+def api_response(data, status=200):
+    return Response(json.dumps(data), status=status, mimetype='application/json')
 
 # Detect OS
 CURRENT_OS = sys.platform
@@ -131,6 +136,12 @@ class Z407Remote:
     async def mute_pc(self):
         pyautogui.press('volumemute')
 
+    # New commands
+    async def bass_up(self): await self._send_command("8000")
+    async def bass_down(self): await self._send_command("8001")
+    async def next_track_speaker(self): await self._send_command("8005")
+    async def prev_track_speaker(self): await self._send_command("8006")
+
 # Helper to find local IP
 def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -173,30 +184,63 @@ async def find_device():
             
     return None
 
+async def manage_connection():
+    global remote_control
+    
+    # Wait a moment for server to fully initialize
+    await asyncio.sleep(1)
+    
+    print("Starting background connection manager...")
+    
+    while True:
+        # If already connected, just wait and check later (heartbeat)
+        if remote_control and remote_control.connected:
+            await asyncio.sleep(5)
+            continue
+            
+        print("Scanning for Z407...")
+        device = await find_device()
+        
+        if device:
+            print(f"Found Z407 at {device.address}")
+            remote_control = Z407Remote(device.address)
+            try:
+                await remote_control.connect()
+                print(f"\033[92m[✓] Connected successfully to {device.address}\033[0m")
+            except Exception as e:
+                err_str = str(e)
+                print(f"Connection failed: {err_str}")
+                
+                if "2147418113" in err_str or "Catastrophic" in err_str or "catastrófico" in err_str:
+                    print(f"\033[91m[!] CRITICAL WINDOWS BLUETOOTH ERROR\033[0m")
+                    print("This 'Catastrophic failure' usually means Windows is confused.")
+                    print("FIX: Go to Windows Settings > Bluetooth > Remove Z407 > Re-pair them.")
+                else:
+                    print(f"\033[93m[!] Could not connect. Retrying in 5s...\033[0m")
+        else:
+            print(f"\033[91m[X] Z407 speakers NOT FOUND. Retrying in 5s...\033[0m")
+        
+        await asyncio.sleep(5)
+
 @app.before_serving
 async def startup():
     global remote_control
     
-    # Start IP reminder task in background
-    app.add_background_task(print_ip_reminder)
-
-    device = await find_device()
-    if device:
-        print(f"Found Z407 at {device.address}")
-        remote_control = Z407Remote(device.address)
-        try:
-            await remote_control.connect()
-        except Exception as e:
-            print(f"Initial connection failed: {e}")
-            print("Server will start anyway. You can try to reconnect from the Web UI.")
-    else:
-        print("Z407 speakers NOT FOUND. Make sure they are on and not connected to another remote.")
+    # Use standard asyncio tasks instead of app.add_background_task to avoid 
+    # ContextVar LookupError on Windows when interacting with Bleak/hardware
+    asyncio.create_task(print_ip_reminder())
+    asyncio.create_task(manage_connection())
 
 @app.after_serving
 async def cleanup():
     global remote_control
     if remote_control:
         await remote_control.disconnect()
+    
+    print("\n" + "="*50)
+    print("👋 Goodbye! Thanks for using this app.")
+    print("🚀 More projects at: https://androrama.com")
+    print("="*50 + "\n")
 
 # --- Routes ---
 
@@ -214,19 +258,14 @@ async def get_status():
         if remote_control.connected:
             connected = True
         vol = remote_control.current_volume
-    return jsonify(connected=connected, volume=vol)
+    return api_response({'connected': connected, 'volume': vol})
 
 @app.route('/api/<command>', methods=['POST'])
 async def handle_command(command):
     global remote_control
-    if not remote_control:
-        # Try to find it again if missing
-        device = await find_device()
-        if device:
-            remote_control = Z407Remote(device.address)
-            await remote_control.connect()
-        else:
-            return jsonify(success=False, error="Speakers not found"), 404
+    
+    if not remote_control or not remote_control.connected:
+         return api_response({'success': False, 'error': "Speakers not connected. Waiting for background connection..."}, 404)
 
     try:
         if command == 'vol_up': await remote_control.volume_up()
@@ -242,12 +281,19 @@ async def handle_command(command):
         elif command == 'factory_reset': await remote_control.factory_reset()
         elif command == 'next': await remote_control.next_track()
         elif command == 'prev': await remote_control.prev_track()
+        # New commands
+        elif command == 'input_usb': await remote_control.input_usb()
+        elif command == 'bass_up': await remote_control.bass_up()
+        elif command == 'bass_down': await remote_control.bass_down()
+        elif command == 'next_speaker': await remote_control.next_track_speaker()
+        elif command == 'prev_speaker': await remote_control.prev_track_speaker()
         else:
-            return jsonify(success=False, error="Unknown command"), 400
+            return api_response({'success': False, 'error': "Unknown command"}, 400)
         
-        return jsonify(success=True)
+        return api_response({'success': True})
     except Exception as e:
-        return jsonify(success=False, error=str(e)), 500
+        print(f"Command execution error: {e}")
+        return api_response({'success': False, 'error': str(e)}, 500)
 
 if __name__ == "__main__":
     import argparse
@@ -294,4 +340,13 @@ if __name__ == "__main__":
         print("\nPress ENTER to close the window...")
         input() 
     except KeyboardInterrupt:
-        pass # Clean exit on Ctrl+C
+        pass # Fall through to exit
+
+    # Clean exit pause
+    print("\n" + "="*50)
+    print("👋 Goodbye! Thanks for using this app.")
+    print("🚀 More projects at: https://androrama.com")
+    print("="*50 + "\n")
+    print("Press ENTER to close the window...")
+    input()
+    sys.exit(0)

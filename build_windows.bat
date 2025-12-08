@@ -74,29 +74,20 @@ if /i "!INSTALL_PY!" neq "Y" goto :PYTHON_REQUIRED_EXIT
 
 :INSTALL_PYTHON
 echo.
-echo [*] Attempting install via Winget...
-winget source update >nul 2>&1
+echo [*] Installing Python 3.12 (Direct Download)...
 
-echo [*] Installing Python 3.12...
-winget install --id Python.Python.3.12 --source winget --accept-package-agreements --accept-source-agreements
-if %errorlevel% neq 0 (
-    echo.
-    echo [!] Winget Installation Failed! Error Code: %errorlevel%
-    echo     (If code is 1625, it means 'Blocked by Group Policy')
-    echo.
-    echo [*] Trying fallback: Direct Download...
-    powershell -Command "Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.12.1/python-3.12.1-amd64.exe' -OutFile 'python_installer.exe'"
-    if exist "python_installer.exe" (
-        echo [*] Running manual installer...
-        start /wait "" "python_installer.exe" /quiet InstallAllUsers=0 PrependPath=1 Include_test=0
-        del "python_installer.exe"
-        echo [OK] Installer finished.
-    ) else (
-        echo [X] Failed to download installer.
-        echo     Please install Python 3.12 manually from python.org
-        pause
-        exit /b 1
-    )
+echo [*] Downloading installer...
+powershell -Command "Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.12.1/python-3.12.1-amd64.exe' -OutFile 'python_installer.exe'"
+if exist "python_installer.exe" (
+    echo [*] Running manual installer...
+    start /wait "" "python_installer.exe" /quiet InstallAllUsers=0 PrependPath=1 Include_test=0
+    del "python_installer.exe"
+    echo [OK] Installer finished.
+) else (
+    echo [X] Failed to download installer.
+    echo     Please install Python 3.12 manually from python.org
+    pause
+    exit /b 1
 )
 
 echo.

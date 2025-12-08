@@ -5,6 +5,8 @@ Controls your speakers via Bluetooth Low Energy (BLE) from any browser on your n
 
 *(Note: There is also a version for Linux/Raspberry Pi available).*
 
+*Tip: If this version fails to connect to your speakers, try downloading a previous release (the connection logic has been updated in this version).*
+
 <div align="center">
   <img src="logi.PNG" alt="Logitech Z407 Remote" width="300">
 </div>
@@ -49,6 +51,13 @@ Z407_Control_Windows.exe --ip 127.0.0.1 --port 8080
 - **Firewall / VPN:** If your phone can't load the page, check Windows Firewall settings (allow the app). If using a **VPN**, enable **"Allow LAN access"** or **"Split Tunneling"** in your VPN settings so devices on your local network can still connect.
 - **Connection Failed:** Make sure no other device is currently controlling the speakers via Bluetooth app.
 - **Icon Error:** If the build fails saying it can't find `icon.ico`, make sure you have `icon.png` in the root folder, or delete it to use the default icon.
+
+### Connection Troubleshooting Steps
+If the connection keeps failing, please try the following steps in this order:
+1. Disconnect and reconnect the speakers from the power outlet.
+2. Turn Bluetooth off and on again on your computer.
+3. Unpair and re-pair the Z407 device.
+4. Restart your computer.
 
 ## Credits
 Based on the reverse engineering work by [freundTech](https://github.com/freundTech/logi-z407-reverse-engineering).

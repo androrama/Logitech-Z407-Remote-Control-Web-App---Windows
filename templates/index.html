@@ -237,12 +237,24 @@
         </div>
         <div style="font-size: 0.8rem; margin-bottom: 20px;">Volume (Estimated): <span id="volText">50%</span></div>
 
-        <!-- Primary Speaker Control -->
         <div class="controls" style="grid-template-columns: 1fr;">
             <button class="btn-main-play" onclick="sendCommand('play_pause')">
                 <span class="icon">⏯</span> Speaker Play / Pause
             </button>
         </div>
+
+        <!-- Speaker Track Control -->
+        <div class="controls" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+            <button class="btn" style="padding: 15px;" onclick="sendCommand('prev_speaker')">
+                <span class="icon">⏮</span> Spkr
+            </button>
+            <button class="btn" style="padding: 15px;" onclick="sendCommand('next_speaker')">
+                Spkr <span class="icon">⏭</span>
+            </button>
+        </div>
+
+        <div style="text-align: center; color: #666; font-size: 0.8rem; margin-top: 15px; margin-bottom: 5px;">MASTER
+            VOLUME</div>
 
         <div class="controls">
             <button class="btn" onclick="sendCommand('vol_down')">
@@ -250,6 +262,17 @@
             </button>
             <button class="btn" onclick="sendCommand('vol_up')">
                 <span class="icon">➕</span>
+            </button>
+        </div>
+
+        <div style="text-align: center; color: #666; font-size: 0.8rem; margin-top: 5px; margin-bottom: 5px;">BASS LEVEL
+        </div>
+        <div class="controls">
+            <button class="btn" onclick="sendCommand('bass_down')">
+                <span>Bass ➖</span>
+            </button>
+            <button class="btn" onclick="sendCommand('bass_up')">
+                <span>Bass ➕</span>
             </button>
         </div>
 
@@ -282,9 +305,13 @@
                 </button>
             </div>
         </div>
-        <div class="controls">
-            <button class="btn" onclick="sendCommand('input_aux')">AUX (Jack)</button>
-            <button class="btn" onclick="sendCommand('input_bluetooth')">BT</button>
+        <div style="text-align: center; color: #666; font-size: 0.8rem; margin-top: 5px; margin-bottom: 5px;">INPUT
+            SOURCE</div>
+        <div class="controls" style="grid-template-columns: 1fr 1fr 1fr;">
+            <button class="btn" style="padding: 15px; font-size: 1rem;" onclick="sendCommand('input_aux')">AUX</button>
+            <button class="btn" style="padding: 15px; font-size: 1rem;" onclick="sendCommand('input_usb')">USB</button>
+            <button class="btn" style="padding: 15px; font-size: 1rem;"
+                onclick="sendCommand('input_bluetooth')">BT</button>
         </div>
 
         <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
@@ -311,6 +338,10 @@
             <span id="helpTextWin">Windows Help</span>
         </button>
         <div id="winHelp" class="help-content" style="display: none;">
+            <p style="margin-bottom: 15px; font-size: 0.9em; border-bottom: 1px solid #444; padding-bottom: 10px;">
+                Tip: If this version does not work for you (connection errors), please try an older release. The
+                connection logic has been updated recently.
+            </p>
             <p><strong>1. Bluetooth Won't connect?</strong><br>
                 Ensure your PC Bluetooth is ON and speakers are already paired in Windows Settings.</p>
             <p><strong>2. PC Buttons not working?</strong><br>
