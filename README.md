@@ -59,9 +59,8 @@ If the connection keeps failing, please try the following steps in this order:
 3. Unpair and re-pair the Z407 device.
 4. Restart your computer.
 
-
-[Reddit post](##%20Reddit%20post:%20https://www.reddit.com/user/Automatic_Basket6301/comments/1pijklk/control_your_logitech_z407_from_any_device_with_a/)
-
+[Reddit post](https://www.reddit.com/user/Automatic_Basket6301/comments/1pijklk/control_your_logitech_z407_from_any_device_with_a/)
+https://www.reddit.com/user/Automatic_Basket6301/comments/1pijklk/control_your_logitech_z407_from_any_device_with_a/
 
 ## Credits
 Based on the reverse engineering work by [freundTech](https://github.com/freundTech/logi-z407-reverse-engineering).
