@@ -61,7 +61,10 @@ If the connection keeps failing, please try the following steps in this order:
 
 ## Credits
 Based on the reverse engineering work by [freundTech](https://github.com/freundTech/logi-z407-reverse-engineering).
+Similar App: https://www.reddit.com/r/logitech/comments/1eny8nh/control_your_logitech_z407_speakers_with_this/?tl=es-es
 Web App implementation by **Androrama**.
+
+## Reddit post: https://www.reddit.com/r/logitech/comments/1eny8nh/control_your_logitech_z407_speakers_with_this/?tl=es-es
 
 ## Disclaimer
 This project is an unofficial open-source application and is **NOT** affiliated with, endorsed by, or connected to **Logitech (Logi)**.
